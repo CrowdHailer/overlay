@@ -1,8 +1,8 @@
 import gleam/http/request.{type Request}
-import llm/chat
-import llm/provider/mistral
-import llm/provider/ollama
-import llm/tool
+import overlay/llm/chat
+import overlay/llm/provider/mistral
+import overlay/llm/provider/ollama
+import overlay/llm/tool
 
 pub type Provider {
   Ollama(ollama.Config)

@@ -1,6 +1,6 @@
 import gleam/list
-import llm/tool
 import oas/generator/utils
+import overlay/llm/tool
 
 pub type Message(call) {
   UserMessage(text: String, images: List(String))

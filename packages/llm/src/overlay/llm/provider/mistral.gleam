@@ -8,11 +8,11 @@ import gleam/json
 import gleam/list
 import gleam/option.{None}
 import gleam/string
-import llm/chat
-import llm/requestx
-import llm/stringx
-import llm/tool
 import oas/generator/utils
+import overlay/llm/chat
+import overlay/llm/requestx
+import overlay/llm/stringx
+import overlay/llm/tool
 import spotless/origin
 
 pub type Config {

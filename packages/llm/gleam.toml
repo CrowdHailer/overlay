@@ -1,4 +1,4 @@
-name = "llm"
+name = "overlay_llm"
 version = "0.0.0"
 
 description = "An API for LLM completion that unifies across different providers."
