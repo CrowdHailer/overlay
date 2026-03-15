@@ -1,0 +1,34 @@
+name: test
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        gleam: ["1.14", "1.15.0-rc1"]
+        otp: ["28.2", "28.3"]
+        rebar3: ["3.25"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          gleam-version: ${{matrix.gleam}}
+          rebar3-version: ${{matrix.rebar3}}
+      - run: gleam deps download
+        shell: bash # Required for git deps
+        working-directory: packages/llm
+      - run: gleam build --warnings-as-errors
+        working-directory: packages/llm
+      - run: gleam test
+        working-directory: packages/llm
+      - run: gleam format --check src test
+        working-directory: packages/llm

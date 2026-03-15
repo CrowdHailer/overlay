@@ -19,9 +19,7 @@ pub fn completion_request(
   case provider {
     Ollama(config) ->
       ollama.completion_request(config, model, system_prompt, history, tools)
-
-    Mistral(_config) -> todo
-    // mistral.completion_request(config, model, system_prompt, history, tools)
+    Mistral(_config) -> panic as "unsupported"
   }
 }
 
