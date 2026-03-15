@@ -9,11 +9,11 @@ import gleam/list
 import gleam/option.{None}
 import gleam/string
 import oas/generator/utils
+import ogre/origin
 import overlay/llm/chat
 import overlay/llm/requestx
 import overlay/llm/stringx
 import overlay/llm/tool
-import spotless/origin
 
 pub type Config {
   Config(api_key: String)

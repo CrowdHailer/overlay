@@ -7,11 +7,11 @@ import gleam/json
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import oas/generator/utils
+import ogre/origin
 import overlay/llm/chat
 import overlay/llm/requestx
 import overlay/llm/stringx
 import overlay/llm/tool
-import spotless/origin
 
 pub type Config {
   Config(origin: origin.Origin, api_key: Option(String))

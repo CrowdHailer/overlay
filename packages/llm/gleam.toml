@@ -10,8 +10,8 @@ links = [{ title = "EYG", href = "https://eyg.run/" }]
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
 gleam_json = ">= 3.1.0 and < 4.0.0"
 castor = ">= 2.0.0 and < 3.0.0"
-spotless = ">= 3.3.0 and < 4.0.0"
 gleam_http = ">= 4.3.0 and < 5.0.0"
+ogre = { path = "../ogre" }
 oas_generator_utils = ">= 1.1.0 and < 2.0.0"
 mork = ">= 1.11.1 and < 2.0.0"
 
