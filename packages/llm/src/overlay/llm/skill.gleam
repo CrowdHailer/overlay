@@ -1,4 +1,5 @@
 import gleam/list
+import gleam/result.{try}
 import gleam/string
 import mork
 
@@ -6,17 +7,19 @@ pub type Document {
   Document(name: String, description: String, content: String)
 }
 
-pub fn parse(content) {
+pub type Failure {
+  MissingName
+  MissingDescription
+}
+
+pub fn parse(content: String) -> Result(Document, Failure) {
   let #(front, content) = mork.split_frontmatter_from_input(content)
   let lines = string.split(front, "\n")
-  let name = case get_field(lines, "name") {
-    Ok(name) -> name
-    _ -> panic
-  }
-  let description = case get_field(lines, "description") {
-    Ok(description) -> description
-    _ -> panic
-  }
+  use name <- try(get_field(lines, "name") |> result.replace_error(MissingName))
+  use description <- try(
+    get_field(lines, "description") |> result.replace_error(MissingDescription),
+  )
+
   Ok(Document(name:, description:, content:))
 }
 
