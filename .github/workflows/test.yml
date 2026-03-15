@@ -8,7 +8,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  test-beam:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -29,6 +29,32 @@ jobs:
       - run: gleam build --warnings-as-errors
         working-directory: packages/llm
       - run: gleam test
+        working-directory: packages/llm
+      - run: gleam format --check src test
+        working-directory: packages/llm
+  test-bun:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        gleam: ["1.15.0-rc1"]
+        otp: ["28.3"]
+        bun: ["1.3.10", "1.3.9"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{matrix.bun}}
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          gleam-version: ${{matrix.gleam}}
+      - run: gleam deps download
+        shell: bash # Required for git deps
+        working-directory: packages/llm
+      - run: gleam build --warnings-as-errors
+        working-directory: packages/llm
+      - run: gleam test --target javascript --runtime bun
         working-directory: packages/llm
       - run: gleam format --check src test
         working-directory: packages/llm
