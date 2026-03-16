@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+ 
+set -euo pipefail
+gleam build
+bun build build/dev/javascript/overlay_bun/overlay_bun.mjs --compile --footer="main();" --outfile ./dist/overlay

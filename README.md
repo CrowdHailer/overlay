@@ -10,6 +10,10 @@ The project is broken into the following packages.
 - [Web](./packages/web) The web implementation of Overlay.
 - [Bun](./packages/bun) The default Tui implementation of Overlay built on bun.js.
 
+## Contributing
+
+To contribute to this repo requires `bun` and `gleam` to be installed.
+
 ## Credit
 
 Created for [EYG](https://eyg.run/), a new integration focused programming language.
