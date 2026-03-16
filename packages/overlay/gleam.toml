@@ -1,0 +1,16 @@
+name = "overlay"
+version = "1.0.0"
+
+description = "An open LLM workspace assistant."
+licences = ["Apache-2.0"]
+repository = { type = "github", user = "crowdhailer", repo = "" }
+links = []
+
+[dependencies]
+gleam_stdlib = ">= 0.44.0 and < 2.0.0"
+castor = ">= 2.0.0 and < 3.0.0"
+overlay_llm = { path = "../llm" }
+oas_generator_utils = ">= 1.1.0 and < 2.0.0"
+
+[dev-dependencies]
+gleeunit = ">= 1.0.0 and < 2.0.0"
