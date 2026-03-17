@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
  
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.."
+
 gleam build
 bun build build/dev/javascript/overlay_bun/overlay_bun.mjs --compile --footer="main();" --outfile ./dist/overlay

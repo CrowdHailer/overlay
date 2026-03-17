@@ -10,9 +10,15 @@ To build and install from source
 ./bin/compile
 ```
 
-Copy to a directory on your $PATH
+Copy to a directory on your $PATH. *This will probably require sudo.*
 ```sh
-cp ./dist/overlay /usr/local/bin/overlay
+mv ./dist/overlay /usr/local/bin/overlay
+```
+
+To achieve all in one step use the install script.
+
+```sh
+./bin/install
 ```
 
 ## Development
