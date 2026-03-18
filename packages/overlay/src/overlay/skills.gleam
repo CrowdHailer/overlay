@@ -3,6 +3,25 @@ import gleam/result.{try}
 import gleam/string
 import mork
 
+pub fn search_paths(from: String) {
+  string.split(from, "/")
+  |> list.reverse
+  |> do_search_paths([])
+}
+
+fn do_search_paths(reversed, acc) {
+  case reversed {
+    [] -> acc
+    [_, ..rest] -> {
+      let path =
+        ["skills", ..reversed]
+        |> list.reverse
+        |> string.join("/")
+      do_search_paths(rest, [path, ..acc])
+    }
+  }
+}
+
 pub type Document {
   Document(name: String, description: String, content: String)
 }

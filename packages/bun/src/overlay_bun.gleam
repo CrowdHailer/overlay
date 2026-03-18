@@ -1,7 +1,10 @@
 import argv
 import envoy
+import gleam/dict
+import gleam/int
 import gleam/io
 import gleam/result
+import overlay/bun/skills
 import overlay/config
 import overlay/llm/provider
 import overlay/llm/provider/mistral
@@ -35,6 +38,8 @@ pub fn main() -> Nil {
     _ -> Error("unknown provider: " <> provider)
   })
   io.println("started overlay in dir: " <> config.root)
+  let skills = skills.read_all(config.root)
+  io.println("discovered " <> int.to_string(dict.size(skills)) <> " skills")
 }
 
 fn get_env(key) {

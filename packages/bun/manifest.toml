@@ -20,7 +20,7 @@ packages = [
   { name = "non_empty_list", version = "2.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "non_empty_list", source = "hex", outer_checksum = "1CA43D18C07E98E9ED5A60D9CB2FFE0FF40DEFFA45D58A3FF589589F05658F7B" },
   { name = "oas_generator_utils", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_javascript", "gleam_json", "gleam_stdlib"], otp_app = "oas_generator_utils", source = "hex", outer_checksum = "54FE8BD638AD149BA943ADD0A8A66E549B2288328AB3EBF764D52805A041EA96" },
   { name = "ogre", version = "0.0.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_stdlib"], source = "local", path = "../ogre" },
-  { name = "overlay", version = "1.0.0", build_tools = ["gleam"], requirements = ["castor", "filepath", "gleam_stdlib", "glint", "oas_generator_utils", "overlay_llm"], source = "local", path = "../overlay" },
+  { name = "overlay", version = "1.0.0", build_tools = ["gleam"], requirements = ["castor", "filepath", "gleam_stdlib", "glint", "oas_generator_utils", "ogre", "overlay_llm"], source = "local", path = "../overlay" },
   { name = "overlay_llm", version = "0.0.0", build_tools = ["gleam"], requirements = ["castor", "gleam_http", "gleam_json", "gleam_stdlib", "mork", "oas_generator_utils", "ogre"], source = "local", path = "../llm" },
   { name = "simplifile", version = "2.4.0", build_tools = ["gleam"], requirements = ["filepath", "gleam_stdlib"], otp_app = "simplifile", source = "hex", outer_checksum = "7C18AFA4FED0B4CE1FA5B0B4BAC1FA1744427054EA993565F6F3F82E5453170D" },
   { name = "snag", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "snag", source = "hex", outer_checksum = "274F41D6C3ECF99F7686FDCE54183333E41D2C1CA5A3A673F9A8B2C7A4401077" },
@@ -30,6 +30,7 @@ packages = [
 [requirements]
 argv = { version = ">= 1.0.2 and < 2.0.0" }
 envoy = { version = ">= 1.1.0 and < 2.0.0" }
+filepath = { version = ">= 1.1.2 and < 2.0.0" }
 gleam_stdlib = { version = ">= 0.44.0 and < 2.0.0" }
 gleeunit = { version = ">= 1.0.0 and < 2.0.0" }
 overlay = { path = "../overlay" }
