@@ -16,12 +16,13 @@ packages = [
   { name = "gleam_stdlib", version = "0.70.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "86949BF5D1F0E4AC0AB5B06F235D8A5CC11A2DFC33BF22F752156ED61CA7D0FF" },
   { name = "gleeunit", version = "1.9.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleeunit", source = "hex", outer_checksum = "DA9553CE58B67924B3C631F96FE3370C49EB6D6DC6B384EC4862CC4AAA718F3C" },
   { name = "glint", version = "1.2.1", build_tools = ["gleam"], requirements = ["gleam_community_ansi", "gleam_community_colour", "gleam_stdlib", "snag"], otp_app = "glint", source = "hex", outer_checksum = "2214C7CEFDE457CEE62140C3D4899B964E05236DA74E4243DFADF4AF29C382BB" },
+  { name = "input", version = "1.0.1", build_tools = ["gleam"], requirements = [], otp_app = "input", source = "hex", outer_checksum = "FE84CDADC78A1367E4AFD561A529825A8FEC88D165CBDF511FD3226CABCDEE6F" },
   { name = "mork", version = "1.11.1", build_tools = ["gleam"], requirements = ["casefold", "gleam_regexp", "gleam_stdlib", "splitter"], otp_app = "mork", source = "hex", outer_checksum = "2DB4900FCCBB2CF9AB8C8438620FE00FC38CC6D340D52275D10769A4B43B3E5B" },
   { name = "non_empty_list", version = "2.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "non_empty_list", source = "hex", outer_checksum = "1CA43D18C07E98E9ED5A60D9CB2FFE0FF40DEFFA45D58A3FF589589F05658F7B" },
   { name = "oas_generator_utils", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_javascript", "gleam_json", "gleam_stdlib"], otp_app = "oas_generator_utils", source = "hex", outer_checksum = "54FE8BD638AD149BA943ADD0A8A66E549B2288328AB3EBF764D52805A041EA96" },
   { name = "ogre", version = "0.0.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_stdlib"], source = "local", path = "../ogre" },
-  { name = "overlay", version = "1.0.0", build_tools = ["gleam"], requirements = ["castor", "filepath", "gleam_stdlib", "glint", "oas_generator_utils", "ogre", "overlay_llm"], source = "local", path = "../overlay" },
-  { name = "overlay_llm", version = "0.0.0", build_tools = ["gleam"], requirements = ["castor", "gleam_http", "gleam_json", "gleam_stdlib", "mork", "oas_generator_utils", "ogre"], source = "local", path = "../llm" },
+  { name = "overlay", version = "1.0.0", build_tools = ["gleam"], requirements = ["castor", "filepath", "gleam_stdlib", "glint", "mork", "oas_generator_utils", "ogre", "overlay_llm"], source = "local", path = "../overlay" },
+  { name = "overlay_llm", version = "0.0.0", build_tools = ["gleam"], requirements = ["castor", "gleam_http", "gleam_json", "gleam_stdlib", "oas_generator_utils", "ogre"], source = "local", path = "../llm" },
   { name = "simplifile", version = "2.4.0", build_tools = ["gleam"], requirements = ["filepath", "gleam_stdlib"], otp_app = "simplifile", source = "hex", outer_checksum = "7C18AFA4FED0B4CE1FA5B0B4BAC1FA1744427054EA993565F6F3F82E5453170D" },
   { name = "snag", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "snag", source = "hex", outer_checksum = "274F41D6C3ECF99F7686FDCE54183333E41D2C1CA5A3A673F9A8B2C7A4401077" },
   { name = "splitter", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "splitter", source = "hex", outer_checksum = "3DFD6B6C49E61EDAF6F7B27A42054A17CFF6CA2135FF553D0CB61C234D281DD0" },
@@ -31,8 +32,10 @@ packages = [
 argv = { version = ">= 1.0.2 and < 2.0.0" }
 envoy = { version = ">= 1.1.0 and < 2.0.0" }
 filepath = { version = ">= 1.1.2 and < 2.0.0" }
+gleam_community_ansi = { version = ">= 1.4.4 and < 2.0.0" }
 gleam_stdlib = { version = ">= 0.44.0 and < 2.0.0" }
 gleeunit = { version = ">= 1.0.0 and < 2.0.0" }
+input = { version = ">= 1.0.1 and < 2.0.0" }
 overlay = { path = "../overlay" }
 overlay_llm = { path = "../llm" }
 simplifile = { version = ">= 2.4.0 and < 3.0.0" }
