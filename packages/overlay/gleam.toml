@@ -9,8 +9,11 @@ links = []
 [dependencies]
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
 castor = ">= 2.0.0 and < 3.0.0"
-overlay_llm = { path = "../llm" }
+filepath = ">= 1.1.2 and < 2.0.0"
+glint = ">= 1.2.1 and < 2.0.0"
 oas_generator_utils = ">= 1.1.0 and < 2.0.0"
+ogre = { path = "../ogre" }
+overlay_llm = { path = "../llm" }
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
