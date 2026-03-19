@@ -24,7 +24,7 @@ To achieve all in one step use the install script.
 ## Development
 
 ```sh
-gleam run . --read ../sibling --history
+gleam run -- . --provider ollama.com
 ```
 
 To run the tests.

@@ -35,7 +35,7 @@ pub fn load() {
   }
 }
 
-fn get_env(key) {
+pub fn get_env(key) {
   envoy.get(key)
   |> result.replace_error("missing environment variable: " <> key)
 }

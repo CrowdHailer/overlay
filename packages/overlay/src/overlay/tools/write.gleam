@@ -3,12 +3,15 @@ import gleam/dynamic/decode
 import oas/generator/utils
 import overlay/llm/tool
 
-pub const name = "list"
+pub const name = "write"
 
-pub const description = "List the contents of a directory"
+pub const description = "write a file"
 
 pub fn parameters() {
-  [castor.field("path", castor.string())]
+  [
+    castor.field("path", castor.string()),
+    castor.field("content", castor.string()),
+  ]
 }
 
 pub fn spec() {
@@ -18,7 +21,9 @@ pub fn spec() {
 pub fn cast(arguments) {
   let arguments = utils.fields_to_dynamic(arguments)
   let decoder = {
-    decode.field("path", decode.string, decode.success)
+    use path <- decode.field("path", decode.string)
+    use content <- decode.field("content", decode.string)
+    decode.success(#(path, content))
   }
   decode.run(arguments, decoder)
 }

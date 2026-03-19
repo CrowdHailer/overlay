@@ -11,6 +11,10 @@ links = []
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
 argv = ">= 1.0.2 and < 2.0.0"
 envoy = ">= 1.1.0 and < 2.0.0"
+gleam_fetch = { git = "https://github.com/CrowdHailer/fetch.git", ref = "stream-response" }
+# gleam_javascript = ">= 1.0.0 and < 2.0.0"
+gleam_javascript = { git = "https://github.com/CrowdHailer/javascript.git", ref = "try_sync" }
+gleam_json = ">= 3.1.0 and < 4.0.0"
 overlay = { path = "../overlay" }
 overlay_llm = { path = "../llm" }
 simplifile = ">= 2.4.0 and < 3.0.0"
