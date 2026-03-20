@@ -15,7 +15,7 @@ gleam_json = ">= 3.1.0 and < 4.0.0"
 glint = ">= 1.2.1 and < 2.0.0"
 mork = ">= 1.11.1 and < 2.0.0"
 oas_generator_utils = ">= 1.1.0 and < 2.0.0"
-ogre = { path = "../ogre" }
+ogre = ">= 1.0.0 and < 2.0.0"
 overlay_llm = { path = "../llm" }
 
 [dev-dependencies]
