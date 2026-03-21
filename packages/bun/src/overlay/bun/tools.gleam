@@ -1,3 +1,13 @@
+//// This module is the effectful implementation of the tool calls available to overlay.
+//// The store passed to each tool call is a cache of state that is reusable between tool calls.
+//// Currently this state is only used for keeping access tokens for authenticated calls to API's
+//// The store is currently a bun specific implementation however as it is scoped to tool calls it could be moved to overlay
+//// Moving the full application state to overlay core is a bad idea, because we want to track different state when streaming
+//// vs using The Elm Architecture in a Lustre web app.
+//// 
+//// The code execution tool is defined sans io using an effect type defined in this project.
+//// The other tools could use the same effect logic, this is probably a good idea once we start applying policies for which files can be read.
+
 import gleam/fetch
 import gleam/io
 import gleam/javascript/promise.{type Promise}
@@ -5,6 +15,7 @@ import gleam/result
 import gleam/string
 import gleam_community/ansi
 import overlay/bun/config
+import overlay/bun/tools/eval
 import overlay/llm/tool
 import overlay/tools
 import overlay/tools/get
@@ -22,10 +33,7 @@ pub fn execute(
     Ok(call) -> {
       io.println(ansi.bg_bright_green(tools.log_line(call)))
       case call {
-        tools.Eval(_code) -> {
-          let message = "Failed to call tool `" <> name <> "` it is not setup."
-          promise.resolve(Error(message))
-        }
+        tools.Eval(code) -> do(eval.run(code, store))
         tools.Get(url) -> get(url, store)
         tools.Ls(path) -> ls(path, store)
         tools.Read(path) -> read(path, store)
@@ -38,7 +46,27 @@ pub fn execute(
   }
 }
 
-fn get(url, store) {
+fn do(return) {
+  let #(store, action) = return
+  case action {
+    eval.Done(Ok(text)) -> promise.resolve(Ok(#(tool.Return(text, []), store)))
+    eval.Done(Error(reason)) -> promise.resolve(Error(reason))
+    eval.Read(path:, resume:) -> {
+      do(resume(simplifile.read_bits(path)))
+    }
+    eval.Fetch(request:, resume:) -> {
+      use result <- promise.await(send_bits(request))
+      do(resume(result))
+    }
+  }
+}
+
+pub fn send_bits(request) {
+  use response <- promise.try_await(fetch.send_bits(request))
+  fetch.read_bytes_body(response)
+}
+
+fn get(url: String, store: a) -> Promise(Result(#(tool.Return, a), String)) {
   use #(request, resume) <- promise.try_sync(get.sans_io(url))
   use response <- promise.try_await(send(request))
   promise.resolve(Ok(#(resume(response), store)))

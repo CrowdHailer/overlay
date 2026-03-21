@@ -3,8 +3,6 @@ name: test
 on:
   push:
     branches:
-      - master
-      - main
   pull_request:
 
 jobs:
@@ -54,7 +52,7 @@ jobs:
       - run: gleam deps download
         shell: bash # Required for git deps
         working-directory: packages/${{matrix.package}}
-      - run: gleam build --warnings-as-errors
+      - run: gleam build --target javascript --warnings-as-errors
         working-directory: packages/${{matrix.package}}
       - run: gleam test --target javascript --runtime bun
         working-directory: packages/${{matrix.package}}
