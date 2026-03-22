@@ -1,15 +1,17 @@
-import gleam/dict
 import gleam/io
 import gleam/javascript/promise
 import gleam_community/ansi
 import overlay/bun/cli
 import overlay/bun/llm
 import overlay/bun/tools
+import overlay/bun/tools/state
 import overlay/llm/chat
 import overlay/llm/tool
 
 pub fn start(config) {
-  outer_loop(config, [], dict.new())
+  // Bare config is used by the llm to build full system prompt with tools.
+  // State is used by tools to find the cwd.
+  outer_loop(config, [], state.State(config:))
 }
 
 fn outer_loop(config, history, store) -> promise.Promise(Nil) {

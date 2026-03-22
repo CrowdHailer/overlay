@@ -55,6 +55,12 @@ const preamble = [
   "\n\nThe following skills provide specialized instructions for specific tasks.",
   "Use the read tool to load a skill's file when the task matches its description.",
   "When a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.",
+  "ALWAYS use the full path when loading a skill.",
+  "NEVER invent skills always refer only to the skills listed.",
+  "",
+  "If a user asks about you skills, talents or abilities you are able to share with them information about the skills listed.",
+  "When working with the user if you learn information that would be helpful to add to a skills suggest editing the skill file.",
+  "Make the smallest useful change when updating a skill file",
   "",
   "<available_skills>",
 ]

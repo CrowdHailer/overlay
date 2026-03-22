@@ -1,3 +1,4 @@
+import gleam/dict
 import gleam/fetch
 import gleam/int
 import gleam/io
@@ -11,18 +12,19 @@ import overlay/config.{Config}
 import overlay/llm/chat
 import overlay/llm/provider
 import overlay/llm/tool
+import overlay/skills
 import overlay/tools
 
 pub fn stream(
   config: config.Config,
   history: List(chat.Message(tool.Call)),
 ) -> promise.Promise(Result(chat.Completion(tool.Call), String)) {
-  let Config(provider:, model:, system_prompt:, ..) = config
+  let Config(provider:, model:, system_prompt:, skills:, ..) = config
   let request =
     provider.stream_completion_request(
       provider,
       model,
-      system_prompt,
+      system_prompt <> skills.format_skills_for_prompt(dict.to_list(skills)),
       list.reverse(history),
       tools.specs(),
     )

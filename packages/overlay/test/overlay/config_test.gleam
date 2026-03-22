@@ -43,9 +43,9 @@ pub fn resolved_valid_path_test() {
 
 pub fn cant_escape_directory_test() {
   let cwd = g.dir()
-  let assert Error("invalid working directory") =
+  let assert Error("invalid relative directory") =
     config.from_args(["/../foo"], cwd)
 
-  let assert Error("invalid working directory") =
+  let assert Error("invalid relative directory") =
     config.from_args(["../../../foo"], cwd)
 }

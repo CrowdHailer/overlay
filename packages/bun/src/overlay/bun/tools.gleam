@@ -1,7 +1,7 @@
 //// This module is the effectful implementation of the tool calls available to overlay.
-//// The store passed to each tool call is a cache of state that is reusable between tool calls.
+//// The state passed to each tool call is a cache of state that is reusable between tool calls.
 //// Currently this state is only used for keeping access tokens for authenticated calls to API's
-//// The store is currently a bun specific implementation however as it is scoped to tool calls it could be moved to overlay
+//// The state is currently a bun specific implementation however as it is scoped to tool calls it could be moved to overlay
 //// Moving the full application state to overlay core is a bad idea, because we want to track different state when streaming
 //// vs using The Elm Architecture in a Lustre web app.
 //// 
@@ -16,6 +16,8 @@ import gleam/string
 import gleam_community/ansi
 import overlay/bun/config
 import overlay/bun/tools/eval
+import overlay/bun/tools/state.{type State, State}
+import overlay/filepathx
 import overlay/llm/tool
 import overlay/tools
 import overlay/tools/get
@@ -26,19 +28,19 @@ import simplifile
 
 pub fn execute(
   call: tool.FunctionCall,
-  store,
+  state: State,
 ) -> Promise(Result(#(tool.Return, _), String)) {
   let tool.FunctionCall(name, arguments) = call
   case tools.cast(name, arguments) {
     Ok(call) -> {
       io.println(ansi.bg_bright_green(tools.log_line(call)))
       case call {
-        tools.Eval(code) -> do(eval.run(code, store))
-        tools.Get(url) -> get(url, store)
-        tools.Ls(path) -> ls(path, store)
-        tools.Read(path) -> read(path, store)
-        tools.Search(query) -> search(query, store)
-        tools.Write(#(path, content)) -> write(path, content, store)
+        tools.Eval(code) -> do(eval.run(code, state))
+        tools.Get(url) -> get(url, state)
+        tools.Ls(path) -> ls(path, state)
+        tools.Read(path) -> read(path, state)
+        tools.Search(query) -> search(query, state)
+        tools.Write(#(path, content)) -> write(path, content, state)
       }
     }
     Error(reason) ->
@@ -47,9 +49,9 @@ pub fn execute(
 }
 
 fn do(return) {
-  let #(store, action) = return
+  let #(state, action) = return
   case action {
-    eval.Done(Ok(text)) -> promise.resolve(Ok(#(tool.Return(text, []), store)))
+    eval.Done(Ok(text)) -> promise.resolve(Ok(#(tool.Return(text, []), state)))
     eval.Done(Error(reason)) -> promise.resolve(Error(reason))
     eval.Read(path:, resume:) -> {
       do(resume(simplifile.read_bits(path)))
@@ -66,44 +68,50 @@ pub fn send_bits(request) {
   fetch.read_bytes_body(response)
 }
 
-fn get(url: String, store: a) -> Promise(Result(#(tool.Return, a), String)) {
+fn get(url: String, state: a) -> Promise(Result(#(tool.Return, a), String)) {
   use #(request, resume) <- promise.try_sync(get.sans_io(url))
   use response <- promise.try_await(send(request))
-  promise.resolve(Ok(#(resume(response), store)))
+  promise.resolve(Ok(#(resume(response), state)))
 }
 
-fn ls(path, store) {
+fn ls(path, state) {
+  let State(config:) = state
+  use path <- promise.try_sync(filepathx.resolve_relative(config.root, path))
   use content <- promise.try_sync(
     simplifile.read_directory(path)
     |> result.map_error(simplifile.describe_error),
   )
-  promise.resolve(Ok(#(ls.resume(content), store)))
+  promise.resolve(Ok(#(ls.resume(content), state)))
 }
 
-fn read(path, store) {
+fn read(path, state) {
+  let State(config:) = state
+  use path <- promise.try_sync(filepathx.resolve_relative(config.root, path))
   use content <- promise.try_sync(
     simplifile.read_bits(path)
     |> result.map_error(simplifile.describe_error),
   )
   use value <- promise.try_sync(read.resume(path, content))
-  promise.resolve(Ok(#(value, store)))
+  promise.resolve(Ok(#(value, state)))
 }
 
-pub fn search(query, store) -> Promise(Result(_, String)) {
+pub fn search(query, state) -> Promise(Result(_, String)) {
   use token <- promise.try_sync(config.get_env("OLLAMA_API_KEY"))
   let #(request, resume) = search.sans_io(token, query)
   use response <- promise.try_await(send(request))
   use value <- promise.try_sync(resume(response))
-  promise.resolve(Ok(#(value, store)))
+  promise.resolve(Ok(#(value, state)))
 }
 
-fn write(path, content, store) {
+fn write(path, content, state) {
+  let State(config:) = state
+  use path <- promise.try_sync(filepathx.resolve_relative(config.root, path))
   use Nil <- promise.try_sync(
     simplifile.write(path, content)
     |> result.map_error(simplifile.describe_error),
   )
   let value = tool.Return("written", [])
-  promise.resolve(Ok(#(value, store)))
+  promise.resolve(Ok(#(value, state)))
 }
 
 fn send(request) {

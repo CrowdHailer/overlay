@@ -2,6 +2,10 @@ import gleam/dict
 import multiformats/cid/v1
 import overlay/bun/helpers
 import overlay/bun/tools/eval
+import overlay/bun/tools/state
+import overlay/config
+import overlay/llm/provider
+import overlay/llm/provider/ollama
 
 pub fn simple_script_test() {
   let assert eval.Done(Ok(value)) =
@@ -71,6 +75,14 @@ pub fn unknown_effect_test() {
 
 /// run with a clean cache of tokens
 fn run(code) {
-  let #(_store, return) = eval.run(code, dict.new())
+  let state =
+    state.State(config: config.Config(
+      provider: provider.Ollama(ollama.local()),
+      model: "example-12b",
+      system_prompt: "",
+      root: "/tmp",
+      skills: dict.new(),
+    ))
+  let #(_store, return) = eval.run(code, state)
   return
 }

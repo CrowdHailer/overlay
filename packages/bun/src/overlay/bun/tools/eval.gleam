@@ -22,22 +22,19 @@
 
 import eyg/interpreter/simple_debug
 import eyg/parser/parser
-import gleam/dict
 import gleam/fetch
 import gleam/http/request.{type Request}
 import gleam/http/response.{type Response}
 import gleam/result
 import gleam/string
+import overlay/bun/tools/state.{type State}
 import overlay/runner
 import overlay/tools/eval
 import simplifile
 import touch_grass/fetch as tg_fetch
 import touch_grass/read
 
-pub fn run(
-  code: String,
-  store: dict.Dict(String, String),
-) -> Return(Result(String, String)) {
+pub fn run(code: String, store: State) -> Return(Result(String, String)) {
   case eval.sans_io(code) {
     Ok(return) -> {
       loop(return, store)
@@ -79,7 +76,7 @@ fn loop(return, store) {
 }
 
 pub type Return(t) =
-  #(dict.Dict(String, String), Effect(t))
+  #(State, Effect(t))
 
 pub type Effect(t) {
   Done(t)
