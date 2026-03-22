@@ -15,6 +15,8 @@ import gleam/result
 import gleam/string
 import gleam_community/ansi
 import overlay/bun/config
+import overlay/bun/gleam/fetchx
+import overlay/bun/midas
 import overlay/bun/tools/eval
 import overlay/bun/tools/state.{type State, State}
 import overlay/filepathx
@@ -25,6 +27,10 @@ import overlay/tools/ls
 import overlay/tools/read
 import overlay/tools/search
 import simplifile
+import snag
+import spotless
+import spotless/oauth_2_1/token
+import spotless/proof_key_for_code_exchange as pkce
 
 pub fn execute(
   call: tool.FunctionCall,
@@ -53,19 +59,24 @@ fn do(return) {
   case action {
     eval.Done(Ok(text)) -> promise.resolve(Ok(#(tool.Return(text, []), state)))
     eval.Done(Error(reason)) -> promise.resolve(Error(reason))
+    eval.Authorize(service:, resume:) -> {
+      use return <- promise.await(
+        midas.run(spotless.authenticate(service, [], "", 8080, pkce.S256)),
+      )
+      let return = case return {
+        Ok(token.Response(access_token:, ..)) -> Ok(access_token)
+        Error(reason) -> Error(snag.line_print(reason))
+      }
+      do(resume(return))
+    }
     eval.Read(path:, resume:) -> {
       do(resume(simplifile.read_bits(path)))
     }
     eval.Fetch(request:, resume:) -> {
-      use result <- promise.await(send_bits(request))
+      use result <- promise.await(fetchx.send_bits(request))
       do(resume(result))
     }
   }
-}
-
-pub fn send_bits(request) {
-  use response <- promise.try_await(fetch.send_bits(request))
-  fetch.read_bytes_body(response)
 }
 
 fn get(url: String, state: a) -> Promise(Result(#(tool.Return, a), String)) {

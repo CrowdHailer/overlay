@@ -26,6 +26,7 @@ packages = [
   { name = "glint", version = "1.2.1", build_tools = ["gleam"], requirements = ["gleam_community_ansi", "gleam_community_colour", "gleam_stdlib", "snag"], otp_app = "glint", source = "hex", outer_checksum = "2214C7CEFDE457CEE62140C3D4899B964E05236DA74E4243DFADF4AF29C382BB" },
   { name = "input", version = "1.0.1", build_tools = ["gleam"], requirements = [], otp_app = "input", source = "hex", outer_checksum = "FE84CDADC78A1367E4AFD561A529825A8FEC88D165CBDF511FD3226CABCDEE6F" },
   { name = "julienne", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "julienne", source = "hex", outer_checksum = "B538A503B9967DF02011E5A7F9422A0263D9A91C0DE7B046483DE8FBE7CD472B" },
+  { name = "midas", version = "2.0.0", build_tools = ["gleam"], requirements = ["filepath", "gleam_http", "gleam_json", "gleam_stdlib", "snag"], otp_app = "midas", source = "hex", outer_checksum = "E51EA1F29F91B793C70C81B5C29C2BA343EB7D5F71462542DFF6437F9F9AC4B3" },
   { name = "mork", version = "1.11.1", build_tools = ["gleam"], requirements = ["casefold", "gleam_regexp", "gleam_stdlib", "splitter"], otp_app = "mork", source = "hex", outer_checksum = "2DB4900FCCBB2CF9AB8C8438620FE00FC38CC6D340D52275D10769A4B43B3E5B" },
   { name = "multiformats", version = "4.0.0", build_tools = ["gleam"], requirements = ["base32", "gleam_javascript", "gleam_stdlib", "gleb128"], otp_app = "multiformats", source = "hex", outer_checksum = "48D290956A6F21086EE9C0C2B69ACAF5DC0067EE7E4605990445E5BDC85B7AAE" },
   { name = "non_empty_list", version = "2.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "non_empty_list", source = "hex", outer_checksum = "1CA43D18C07E98E9ED5A60D9CB2FFE0FF40DEFFA45D58A3FF589589F05658F7B" },
@@ -33,9 +34,11 @@ packages = [
   { name = "ogre", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_stdlib"], otp_app = "ogre", source = "hex", outer_checksum = "69FC78865B549D6C7F6281B69206D589AFFF112F49E61059478ED26BF2F1056A" },
   { name = "overlay", version = "1.0.0", build_tools = ["gleam"], requirements = ["castor", "eyg_interpreter", "eyg_ir", "eyg_parser", "filepath", "gleam_http", "gleam_json", "gleam_stdlib", "glint", "julienne", "mork", "multiformats", "oas_generator_utils", "ogre", "overlay_llm", "touch_grass"], source = "local", path = "../overlay" },
   { name = "overlay_llm", version = "0.0.0", build_tools = ["gleam"], requirements = ["castor", "gleam_http", "gleam_json", "gleam_stdlib", "oas_generator_utils", "ogre"], source = "local", path = "../llm" },
+  { name = "shellout", version = "1.8.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "shellout", source = "hex", outer_checksum = "C416356D45151F298108C9DB9CD1EDE0313F620B5EDBB5766CD7237659D87841" },
   { name = "simplifile", version = "2.4.0", build_tools = ["gleam"], requirements = ["filepath", "gleam_stdlib"], otp_app = "simplifile", source = "hex", outer_checksum = "7C18AFA4FED0B4CE1FA5B0B4BAC1FA1744427054EA993565F6F3F82E5453170D" },
   { name = "snag", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "snag", source = "hex", outer_checksum = "274F41D6C3ECF99F7686FDCE54183333E41D2C1CA5A3A673F9A8B2C7A4401077" },
   { name = "splitter", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "splitter", source = "hex", outer_checksum = "3DFD6B6C49E61EDAF6F7B27A42054A17CFF6CA2135FF553D0CB61C234D281DD0" },
+  { name = "spotless", version = "3.4.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_json", "gleam_stdlib", "midas", "ogre", "snag"], otp_app = "spotless", source = "hex", outer_checksum = "2415656D874FD03ED6FF7007B17F41A314277C75E80277E6BE1B7C5033D91444" },
   { name = "touch_grass", version = "0.1.0", build_tools = ["gleam"], requirements = ["eyg_interpreter", "gleam_http", "gleam_stdlib", "julienne", "ogre"], otp_app = "touch_grass", source = "hex", outer_checksum = "0FECAF9E769F777A152A8EB4AA2559F0D9A349CCDCA81BA516C0AAE1BB9AD0BE" },
 ]
 
@@ -55,8 +58,13 @@ gleam_json = { version = ">= 3.1.0 and < 4.0.0" }
 gleam_stdlib = { version = ">= 0.44.0 and < 2.0.0" }
 gleeunit = { version = ">= 1.0.0 and < 2.0.0" }
 input = { version = ">= 1.0.1 and < 2.0.0" }
+midas = { version = ">= 2.0.0 and < 3.0.0" }
 multiformats = { version = ">= 4.0.0 and < 5.0.0" }
+ogre = { version = ">= 1.1.0 and < 2.0.0" }
 overlay = { path = "../overlay" }
 overlay_llm = { path = "../llm" }
+shellout = { version = ">= 1.8.0 and < 2.0.0" }
 simplifile = { version = ">= 2.4.0 and < 3.0.0" }
+snag = { version = ">= 1.2.0 and < 2.0.0" }
+spotless = { version = ">= 3.4.0 and < 4.0.0" }
 touch_grass = { version = ">= 0.1.0 and < 2.0.0" }

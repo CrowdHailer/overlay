@@ -21,12 +21,15 @@
 //// The runner effects could then be unwrapped in the loop at this level. However that would force semantics of external effects further into the core evaluation logic
 
 import eyg/interpreter/simple_debug
+import eyg/interpreter/value as v
 import eyg/parser/parser
 import gleam/fetch
 import gleam/http/request.{type Request}
 import gleam/http/response.{type Response}
 import gleam/result
 import gleam/string
+import ogre/operation
+import ogre/origin
 import overlay/bun/tools/state.{type State}
 import overlay/runner
 import overlay/tools/eval
@@ -49,6 +52,23 @@ fn loop(return, store) {
     runner.Fail(reason) -> #(store, Done(Error(simple_debug.describe(reason))))
     runner.DoEffect(effect:, resume:) ->
       case effect {
+        eval.DirectFetch(service:, operation:) -> {
+          let resume = fn(token_result) {
+            case token_result {
+              Ok(token) -> {
+                let request = service_request(service, operation, token)
+                let resume = fn(result) {
+                  let result = result.map_error(result, string.inspect)
+                  loop(resume(tg_fetch.encode(result)), store)
+                }
+                #(store, Fetch(request:, resume:))
+              }
+              Error(reason) -> loop(resume(v.error(v.String(reason))), store)
+            }
+          }
+          // Return as direct fetch to the top
+          #(store, Authorize(service:, resume:))
+        }
         eval.Fetch(request:) -> {
           let resume = fn(result) {
             let result = result.map_error(result, string.inspect)
@@ -75,11 +95,25 @@ fn loop(return, store) {
   }
 }
 
+fn service_request(service, operation, token) {
+  let origin = case service {
+    "dnsimple" -> origin.https("api.dnsimple.com")
+    "github" -> origin.https("api.github.com")
+    "netlify" -> origin.https("api.netlify.com")
+    "tavily" -> origin.https("api.tavily.com")
+    "vimeo" -> origin.https("api.vimeo.com")
+    _ -> panic
+  }
+  operation.to_request(operation, origin)
+  |> request.set_header("authorization", "Bearer " <> token)
+}
+
 pub type Return(t) =
   #(State, Effect(t))
 
 pub type Effect(t) {
   Done(t)
+  Authorize(service: String, resume: fn(Result(String, String)) -> Return(t))
   Fetch(
     request: Request(BitArray),
     resume: fn(Result(Response(BitArray), fetch.FetchError)) -> Return(t),

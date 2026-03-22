@@ -6,10 +6,12 @@ import gleam/dynamic/decode
 import gleam/http/request
 import gleam/result
 import oas/generator/utils
+import ogre/operation
 import overlay/llm/tool
 import overlay/runner
 import touch_grass/decode_json
 import touch_grass/fetch
+import touch_grass/http
 import touch_grass/read
 
 pub const name = "eval"
@@ -42,6 +44,7 @@ pub fn sans_io(code: String) {
 /// I have made the assumption that overlay assistants will all be set up to work in a similar workspace.
 /// If this assumption is false, the sans_io function will accept a parse_effect function from the caller.
 pub type Effect {
+  DirectFetch(service: String, operation: operation.Operation(BitArray))
   Fetch(request: request.Request(BitArray))
   Read(path: String)
 }
@@ -52,6 +55,7 @@ fn parse_effect(label, lift) {
       use input <- result.map(decode_json.decode(lift))
       runner.Reply(decode_json.sync(input))
     }
+    "DNSimple" -> direct_fetch("dnsimple", lift)
     "Fetch" -> {
       use request <- result.map(fetch.decode(lift))
       runner.External(Fetch(request:))
@@ -62,4 +66,9 @@ fn parse_effect(label, lift) {
     }
     _ -> Error(break.UnhandledEffect(label, lift))
   }
+}
+
+fn direct_fetch(service, lift) {
+  use operation <- result.map(http.operation_to_gleam(lift))
+  runner.External(DirectFetch(service:, operation:))
 }
