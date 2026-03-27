@@ -5,12 +5,12 @@ packages = [
   { name = "argv", version = "1.0.2", build_tools = ["gleam"], requirements = [], otp_app = "argv", source = "hex", outer_checksum = "BA1FF0929525DEBA1CE67256E5ADF77A7CDDFE729E3E3F57A5BDCAA031DED09D" },
   { name = "base32", version = "1.0.0", build_tools = ["rebar3"], requirements = [], otp_app = "base32", source = "hex", outer_checksum = "0449285348ED0C4CD83C7198E76C5FD5A0451C4EF18695B9FD43792A503E551A" },
   { name = "casefold", version = "2.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "casefold", source = "hex", outer_checksum = "F09530B6F771BB7B0BCACD3014089C20DFDA31775BA4793266C3814607C0A468" },
-  { name = "castor", version = "2.0.0", build_tools = ["gleam"], requirements = ["gleam_json", "gleam_stdlib", "non_empty_list", "oas_generator_utils"], otp_app = "castor", source = "hex", outer_checksum = "165CFE776658EF08C54C01972444AB2DCA1DC4BDB6AD91E7EBBA85C4C4A4CC5F" },
+  { name = "castor", version = "2.1.0", build_tools = ["gleam"], requirements = ["gleam_json", "gleam_stdlib", "non_empty_list", "oas_generator_utils"], otp_app = "castor", source = "hex", outer_checksum = "D3659680ABFE81634E27479479431ED66FC43F2547FDB41F0E9ACDE798CD4B13" },
   { name = "dag_json", version = "3.0.0", build_tools = ["gleam"], requirements = ["gleam_json", "gleam_stdlib", "multiformats"], otp_app = "dag_json", source = "hex", outer_checksum = "63DB4075C29092D7A22FB36A01774E56A6E1A62788C7FDA873115546AE1064E2" },
   { name = "envoy", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "envoy", source = "hex", outer_checksum = "850DA9D29D2E5987735872A2B5C81035146D7FE19EFC486129E44440D03FD832" },
   { name = "eyg_interpreter", version = "1.1.0", build_tools = ["gleam"], requirements = ["eyg_ir", "gleam_javascript", "gleam_json", "gleam_stdlib", "multiformats"], otp_app = "eyg_interpreter", source = "hex", outer_checksum = "2550BE77781136DA8F333811C6E722B9470D8E71DFA5D47B081FA7A5390FAE8B" },
   { name = "eyg_ir", version = "1.0.0", build_tools = ["gleam"], requirements = ["dag_json", "gleam_javascript", "gleam_json", "gleam_stdlib", "multiformats"], otp_app = "eyg_ir", source = "hex", outer_checksum = "D61C51AB7B88B76B77867F10CA0C9A7C960C46A1C287543B1B1A8EA4B6F3524C" },
-  { name = "eyg_parser", version = "0.2.0", build_tools = ["gleam"], requirements = ["eyg_ir", "gleam_stdlib", "multiformats"], otp_app = "eyg_parser", source = "hex", outer_checksum = "F9DFAD2308882907DD4F3D6D955F035619ABEC69E2E80F2BCD6A9BEFCC1DAD5A" },
+  { name = "eyg_parser", version = "0.3.0", build_tools = ["gleam"], requirements = ["eyg_ir", "gleam_stdlib", "multiformats"], otp_app = "eyg_parser", source = "hex", outer_checksum = "44E500516D752FAA66A1BCD83976F2D8CC960E9513F5AE2CC57670F40FC8DE83" },
   { name = "filepath", version = "1.1.2", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "filepath", source = "hex", outer_checksum = "B06A9AF0BF10E51401D64B98E4B627F1D2E48C154967DA7AF4D0914780A6D40A" },
   { name = "gleam_community_ansi", version = "1.4.4", build_tools = ["gleam"], requirements = ["gleam_community_colour", "gleam_regexp", "gleam_stdlib"], otp_app = "gleam_community_ansi", source = "hex", outer_checksum = "1B3AEA6074AB34D5F0674744F36DDC7290303A03295507E2DEC61EDD6F5777FE" },
   { name = "gleam_community_colour", version = "2.0.4", build_tools = ["gleam"], requirements = ["gleam_json", "gleam_stdlib"], otp_app = "gleam_community_colour", source = "hex", outer_checksum = "6DB4665555D7D2B27F0EA32EF47E8BEBC4303821765F9C73D483F38EE24894F0" },
@@ -29,7 +29,7 @@ packages = [
   { name = "midas", version = "2.0.0", build_tools = ["gleam"], requirements = ["filepath", "gleam_http", "gleam_json", "gleam_stdlib", "snag"], otp_app = "midas", source = "hex", outer_checksum = "E51EA1F29F91B793C70C81B5C29C2BA343EB7D5F71462542DFF6437F9F9AC4B3" },
   { name = "mork", version = "1.11.1", build_tools = ["gleam"], requirements = ["casefold", "gleam_regexp", "gleam_stdlib", "splitter"], otp_app = "mork", source = "hex", outer_checksum = "2DB4900FCCBB2CF9AB8C8438620FE00FC38CC6D340D52275D10769A4B43B3E5B" },
   { name = "multiformats", version = "4.0.0", build_tools = ["gleam"], requirements = ["base32", "gleam_javascript", "gleam_stdlib", "gleb128"], otp_app = "multiformats", source = "hex", outer_checksum = "48D290956A6F21086EE9C0C2B69ACAF5DC0067EE7E4605990445E5BDC85B7AAE" },
-  { name = "non_empty_list", version = "2.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "non_empty_list", source = "hex", outer_checksum = "1CA43D18C07E98E9ED5A60D9CB2FFE0FF40DEFFA45D58A3FF589589F05658F7B" },
+  { name = "non_empty_list", version = "2.3.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "non_empty_list", source = "hex", outer_checksum = "06F9D3AC751CF7853AD5D24B8139CEB30E42D8799DE8D49F966A6197DF0B01CC" },
   { name = "oas_generator_utils", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_javascript", "gleam_json", "gleam_stdlib"], otp_app = "oas_generator_utils", source = "hex", outer_checksum = "54FE8BD638AD149BA943ADD0A8A66E549B2288328AB3EBF764D52805A041EA96" },
   { name = "ogre", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_stdlib"], otp_app = "ogre", source = "hex", outer_checksum = "69FC78865B549D6C7F6281B69206D589AFFF112F49E61059478ED26BF2F1056A" },
   { name = "overlay", version = "1.0.0", build_tools = ["gleam"], requirements = ["castor", "eyg_interpreter", "eyg_ir", "eyg_parser", "filepath", "gleam_http", "gleam_json", "gleam_stdlib", "glint", "julienne", "mork", "multiformats", "oas_generator_utils", "ogre", "overlay_llm", "touch_grass"], source = "local", path = "../overlay" },
@@ -47,7 +47,7 @@ argv = { version = ">= 1.0.2 and < 2.0.0" }
 envoy = { version = ">= 1.1.0 and < 2.0.0" }
 eyg_interpreter = { version = ">= 1.1.0 and < 2.0.0" }
 eyg_ir = { version = ">= 1.0.0 and < 2.0.0" }
-eyg_parser = { version = ">= 0.2.0 and < 1.0.0" }
+eyg_parser = { version = ">= 0.3.0 and < 1.0.0" }
 filepath = { version = ">= 1.1.2 and < 2.0.0" }
 gleam_community_ansi = { version = ">= 1.4.4 and < 2.0.0" }
 gleam_crypto = { version = ">= 1.5.1 and < 2.0.0" }

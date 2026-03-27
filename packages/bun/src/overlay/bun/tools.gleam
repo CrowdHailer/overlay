@@ -70,6 +70,10 @@ fn do(return) {
       do(resume(return))
     }
     eval.Read(path:, resume:) -> {
+      // relative resolved in lookup in eval
+      // let State(config:) = state
+      // let assert Ok(path) = filepathx.resolve_relative(config.root, path)
+      io.println("reading lower: " <> path)
       do(resume(simplifile.read_bits(path)))
     }
     eval.Fetch(request:, resume:) -> {

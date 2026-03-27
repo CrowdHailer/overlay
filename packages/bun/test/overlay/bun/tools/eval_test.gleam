@@ -1,3 +1,5 @@
+import eyg/ir/dag_json
+import eyg/ir/tree as ir
 import gleam/dict
 import multiformats/cid/v1
 import overlay/bun/helpers
@@ -6,6 +8,7 @@ import overlay/bun/tools/state
 import overlay/config
 import overlay/llm/provider
 import overlay/llm/provider/ollama
+import simplifile
 
 pub fn simple_script_test() {
   let assert eval.Done(Ok(value)) =
@@ -71,6 +74,69 @@ pub fn unknown_effect_test() {
     "perform Foo(2)"
     |> run()
   assert "unhandled effect Foo(2)" == reason
+}
+
+pub fn relative_reference_test() {
+  let assert eval.Read(path:, resume:) =
+    "import \"./foo.eyg.json\""
+    |> run()
+  assert "/tmp/foo.eyg.json" == path
+
+  let assert #(_state, eval.Done(Ok(value))) =
+    resume(Ok(<<"{\"0\":\"i\",\"v\":15}">>))
+  assert "15" == value
+}
+
+pub fn import_unknown_reference_test() {
+  let assert eval.Read(path:, resume:) =
+    "import \"./unknown.eyg.json\""
+    |> run()
+  assert "/tmp/unknown.eyg.json" == path
+
+  let assert #(_state, eval.Done(Error(reason))) =
+    resume(Error(simplifile.NotUtf8))
+  assert "File not UTF-8 encoded" == reason
+}
+
+pub fn import_malformed_reference_test() {
+  let assert eval.Read(path:, resume:) =
+    "import \"./bad.eyg.json\""
+    |> run()
+  assert "/tmp/bad.eyg.json" == path
+
+  let assert #(_state, eval.Done(Error(reason))) = resume(Ok(<<>>))
+  assert "not a valid .eyg.json import" == reason
+}
+
+pub fn relative_module_not_sound_test() {
+  let assert eval.Read(path:, resume:) =
+    "import \"./unsound.eyg.json\""
+    |> run()
+  assert "/tmp/unsound.eyg.json" == path
+
+  let assert #(_state, eval.Done(Error(reason))) =
+    resume(Ok(<<"{\"0\":\"z\"}">>))
+  assert "tried to run a todo" == reason
+}
+
+pub fn follows_relative_reference_test() {
+  let assert eval.Read(path:, resume:) =
+    "let {x: x} = import \"./lib/index.eyg.json\"
+    x"
+    |> run()
+  assert "/tmp/lib/index.eyg.json" == path
+
+  let source =
+    ir.release("../bar.eyg.json", 0, dag_json.vacant_cid)
+    |> dag_json.to_string
+
+  let assert #(_state, eval.Read(path:, resume:)) = resume(Ok(<<source:utf8>>))
+  assert "/tmp/bar.eyg.json" == path
+  let source =
+    ir.record([#("x", ir.integer(10))])
+    |> dag_json.to_string
+  let assert #(_state, eval.Done(Ok(value))) = resume(Ok(<<source:utf8>>))
+  assert "10" == value
 }
 
 /// run with a clean cache of tokens

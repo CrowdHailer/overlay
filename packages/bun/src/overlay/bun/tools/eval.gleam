@@ -20,18 +20,23 @@
 //// Maybe it makes sense to pass in a parse_effect function that is already parameterised to top level actions.
 //// The runner effects could then be unwrapped in the loop at this level. However that would force semantics of external effects further into the core evaluation logic
 
+import eyg/interpreter/break
 import eyg/interpreter/simple_debug
 import eyg/interpreter/value as v
+import eyg/ir/dag_json
 import eyg/parser/parser
+import filepath
 import gleam/fetch
 import gleam/http/request.{type Request}
 import gleam/http/response.{type Response}
+import gleam/json
 import gleam/result
 import gleam/string
 import ogre/operation
 import ogre/origin
 import overlay/bun/tools/state.{type State}
-import overlay/runner
+import overlay/filepathx
+import overlay/runner as r
 import overlay/tools/eval
 import simplifile
 import touch_grass/fetch as tg_fetch
@@ -48,9 +53,9 @@ pub fn run(code: String, store: State) -> Return(Result(String, String)) {
 
 fn loop(return, store) {
   case return {
-    runner.Done(value) -> #(store, Done(Ok(simple_debug.inspect(value))))
-    runner.Fail(reason) -> #(store, Done(Error(simple_debug.describe(reason))))
-    runner.DoEffect(effect:, resume:) ->
+    r.Done(value) -> #(store, Done(Ok(simple_debug.inspect(value))))
+    r.Fail(reason) -> #(store, Done(Error(simple_debug.describe(reason))))
+    r.DoEffect(effect:, resume:) ->
       case effect {
         eval.DirectFetch(service:, operation:) -> {
           let resume = fn(token_result) {
@@ -84,14 +89,95 @@ fn loop(return, store) {
           #(store, Read(path:, resume:))
         }
       }
-    runner.LookupReference(reference: _, resume: _) -> #(
+    r.LookupReference(reference: _, resume: _) -> #(
       store,
       Done(Error("direct reference lookup unsupported")),
     )
-    runner.LookupRelease(..) -> #(
-      store,
-      Done(Error("release lookup unsupported")),
-    )
+    r.LookupRelease(package:, release:, module: _, resume:) ->
+      // I want to pass in a cwd of "." but the expand path logic errors if going above root.
+      lookup_release(package, release, resume, store, store.config.root)
+  }
+}
+
+fn lookup_release(package, release, resume, store, cwd) {
+  case package, release {
+    "./" <> _, 0 | "/" <> _, 0 | "../" <> _, 0 -> {
+      case filepathx.resolve_relative(cwd, package) {
+        Ok(path) -> {
+          let resume = fn(result) {
+            case result {
+              Ok(bytes) ->
+                case json.parse_bits(bytes, dag_json.decoder(Nil)) {
+                  Ok(source) ->
+                    case
+                      r.expression(source, fn(label, lift) {
+                        Error(break.UnhandledEffect(label, lift))
+                      })
+                    {
+                      r.Done(value) -> loop(resume(value), store)
+                      r.Fail(reason) -> #(
+                        store,
+                        Done(Error(simple_debug.describe(reason))),
+                      )
+                      r.DoEffect(effect: _, resume: _) ->
+                        panic as "no effects supported"
+                      r.LookupReference(..) -> #(
+                        store,
+                        Done(Error("nested reference lookup unsupported")),
+                      )
+                      r.LookupRelease(
+                        package:,
+                        release:,
+                        module: _,
+                        resume: inner,
+                      ) -> {
+                        let resume = compose_resume(inner, resume)
+                        let cwd = filepath.directory_name(path)
+
+                        lookup_release(package, release, resume, store, cwd)
+                      }
+                    }
+                  Error(_) -> #(
+                    store,
+                    Done(Error("not a valid .eyg.json import")),
+                  )
+                }
+              Error(reason) -> #(
+                store,
+                Done(Error(simplifile.describe_error(reason))),
+              )
+            }
+          }
+          #(store, Read(path:, resume:))
+        }
+        Error(_) -> {
+          echo #(cwd, package)
+          panic
+        }
+      }
+    }
+    _, _ -> #(store, Done(Error("release lookup unsupported")))
+  }
+}
+
+fn compose_resume(inner, resume) {
+  fn(v) {
+    case inner(v) {
+      // parent resume
+      r.Done(v) -> resume(v)
+      r.Fail(reason) -> r.Fail(reason)
+      r.DoEffect(effect:, resume: inner) ->
+        r.DoEffect(effect:, resume: compose_resume(inner, resume))
+      r.LookupReference(reference:, resume:) ->
+        r.LookupReference(reference:, resume: compose_resume(inner, resume))
+      r.LookupRelease(package:, release:, module:, resume:) ->
+        r.LookupRelease(
+          package:,
+          release:,
+          module:,
+          resume: compose_resume(inner, resume),
+        )
+    }
   }
 }
 
