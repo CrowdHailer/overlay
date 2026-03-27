@@ -1,15 +1,37 @@
+import envoy
 import filepath
 import gleam/dict
+import gleam/dynamic/decode
+import gleam/json
 import gleam/list
 import gleam/result
+import gleam/string
 
 import overlay/skills
 import simplifile
 
 /// Read all the skills from the working directory
 pub fn read_all(working_dir) {
-  list.flat_map(skills.search_paths(working_dir), read)
+  let dirs = skills.search_paths(working_dir)
+
+  let extra = case envoy.get("HOME") {
+    Ok(home) -> {
+      simplifile.read(home <> "/.config/overlay/config.json")
+      |> result.unwrap("")
+      |> json.parse(config_decoder())
+      |> result.unwrap([])
+      |> list.map(string.replace(_, "~", home))
+    }
+    Error(Nil) -> []
+  }
+
+  let dirs = list.append(dirs, extra)
+  list.flat_map(dirs, read)
   |> dict.from_list
+}
+
+fn config_decoder() {
+  decode.field("skills", decode.list(decode.string), decode.success)
 }
 
 fn read(directory) {

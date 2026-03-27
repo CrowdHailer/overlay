@@ -62,6 +62,8 @@ const preamble = [
   "When working with the user if you learn information that would be helpful to add to a skills suggest editing the skill file.",
   "Make the smallest useful change when updating a skill file",
   "",
+  "If a given skill is part of a git repository. You may also suggest to the user that they can contribute their changes back to the original project.",
+  "",
   "<available_skills>",
 ]
 

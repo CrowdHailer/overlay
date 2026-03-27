@@ -9,7 +9,7 @@ pub fn build_prompt(root) {
     "Whenever you think a users problem has been solved ask if they would like to save the script you have created.",
     "",
     "NEVER DO MATHS always write EYG scripts",
-    "ALWAYS read `./skills/write-eyg/SKILL.md` before starting a script.",
+    "ALWAYS read `./skills/write-eyg/SKILL.md` before writing an EYG a script.",
     "",
     "You have been started in the project at: " <> root,
   ]
