@@ -11,8 +11,8 @@ import overlay/llm/tool
 import overlay/runner
 import touch_grass/decode_json
 import touch_grass/fetch
+import touch_grass/file_system/read_file
 import touch_grass/http
-import touch_grass/read
 
 pub const name = "eval"
 
@@ -46,7 +46,7 @@ pub fn sans_io(code: String) {
 pub type Effect {
   DirectFetch(service: String, operation: operation.Operation(BitArray))
   Fetch(request: request.Request(BitArray))
-  Read(path: String)
+  ReadFile(input: read_file.Input)
 }
 
 fn parse_effect(label, lift) {
@@ -60,9 +60,9 @@ fn parse_effect(label, lift) {
       use request <- result.map(fetch.decode(lift))
       runner.External(Fetch(request:))
     }
-    "Read" -> {
-      use path <- result.map(read.decode(lift))
-      runner.External(Read(path:))
+    "ReadFile" -> {
+      use input <- result.map(read_file.decode(lift))
+      runner.External(ReadFile(input:))
     }
     _ -> Error(break.UnhandledEffect(label, lift))
   }

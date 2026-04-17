@@ -47,19 +47,19 @@ pub fn release_test() {
 }
 
 pub fn effect_test() {
-  let assert eval.Read(path:, resume:) =
-    "perform Read(\"hello.md\")"
+  let assert eval.ReadFile(input:, resume:) =
+    "perform ReadFile({path: \"hello.md\", offset: 0, limit: 100000})"
     |> run()
-  assert "hello.md" == path
+  assert "hello.md" == input.path
   let assert #(_, eval.Done(Ok(value))) = resume(Ok(<<"some text">>))
   assert "Ok(Binary(9 bytes): c29tZSB0ZXh0)" == value
 }
 
 pub fn bad_args_to_effect_test() {
   let assert eval.Done(Error(reason)) =
-    "perform Read(3)"
+    "perform ReadFile(3)"
     |> run()
-  assert "unexpected term, expected: String got: 3" == reason
+  assert "unexpected term, expected: Record got: 3" == reason
 }
 
 pub fn abort_test() {
@@ -77,10 +77,10 @@ pub fn unknown_effect_test() {
 }
 
 pub fn relative_reference_test() {
-  let assert eval.Read(path:, resume:) =
+  let assert eval.ReadFile(input:, resume:) =
     "import \"./foo.eyg.json\""
     |> run()
-  assert "/tmp/foo.eyg.json" == path
+  assert "/tmp/foo.eyg.json" == input.path
 
   let assert #(_state, eval.Done(Ok(value))) =
     resume(Ok(<<"{\"0\":\"i\",\"v\":15}">>))
@@ -88,10 +88,10 @@ pub fn relative_reference_test() {
 }
 
 pub fn import_unknown_reference_test() {
-  let assert eval.Read(path:, resume:) =
+  let assert eval.ReadFile(input:, resume:) =
     "import \"./unknown.eyg.json\""
     |> run()
-  assert "/tmp/unknown.eyg.json" == path
+  assert "/tmp/unknown.eyg.json" == input.path
 
   let assert #(_state, eval.Done(Error(reason))) =
     resume(Error(simplifile.NotUtf8))
@@ -99,20 +99,20 @@ pub fn import_unknown_reference_test() {
 }
 
 pub fn import_malformed_reference_test() {
-  let assert eval.Read(path:, resume:) =
+  let assert eval.ReadFile(input:, resume:) =
     "import \"./bad.eyg.json\""
     |> run()
-  assert "/tmp/bad.eyg.json" == path
+  assert "/tmp/bad.eyg.json" == input.path
 
   let assert #(_state, eval.Done(Error(reason))) = resume(Ok(<<>>))
   assert "not a valid .eyg.json import" == reason
 }
 
 pub fn relative_module_not_sound_test() {
-  let assert eval.Read(path:, resume:) =
+  let assert eval.ReadFile(input:, resume:) =
     "import \"./unsound.eyg.json\""
     |> run()
-  assert "/tmp/unsound.eyg.json" == path
+  assert "/tmp/unsound.eyg.json" == input.path
 
   let assert #(_state, eval.Done(Error(reason))) =
     resume(Ok(<<"{\"0\":\"z\"}">>))
@@ -120,18 +120,19 @@ pub fn relative_module_not_sound_test() {
 }
 
 pub fn follows_relative_reference_test() {
-  let assert eval.Read(path:, resume:) =
+  let assert eval.ReadFile(input:, resume:) =
     "let {x: x} = import \"./lib/index.eyg.json\"
     x"
     |> run()
-  assert "/tmp/lib/index.eyg.json" == path
+  assert "/tmp/lib/index.eyg.json" == input.path
 
   let source =
     ir.release("../bar.eyg.json", 0, dag_json.vacant_cid)
     |> dag_json.to_string
 
-  let assert #(_state, eval.Read(path:, resume:)) = resume(Ok(<<source:utf8>>))
-  assert "/tmp/bar.eyg.json" == path
+  let assert #(_state, eval.ReadFile(input:, resume:)) =
+    resume(Ok(<<source:utf8>>))
+  assert "/tmp/bar.eyg.json" == input.path
   let source =
     ir.record([#("x", ir.integer(10))])
     |> dag_json.to_string

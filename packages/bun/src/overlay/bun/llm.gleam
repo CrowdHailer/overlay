@@ -34,7 +34,7 @@ pub fn stream(
   case response.status {
     200 -> {
       use reader <- promise.try_sync(
-        fetch.bytes_reader(response) |> result.map_error(string.inspect),
+        fetch.stream_body(response) |> result.map_error(string.inspect),
       )
       do_stream(reader, provider, <<>>, chat.fresh())
     }
@@ -50,7 +50,7 @@ pub fn stream(
 }
 
 fn do_stream(reader, provider, buffer, completion) {
-  use chunk <- promise.await(fetch.next_bytes(reader))
+  use chunk <- promise.await(fetch.read_chunk(reader))
   case chunk {
     Error(_) -> promise.resolve(Error("llm interrupted"))
     Ok(None) -> promise.resolve(Ok(completion))

@@ -40,7 +40,7 @@ import overlay/runner as r
 import overlay/tools/eval
 import simplifile
 import touch_grass/fetch as tg_fetch
-import touch_grass/read
+import touch_grass/file_system/read_file
 
 pub fn run(code: String, store: State) -> Return(Result(String, String)) {
   case eval.sans_io(code) {
@@ -81,12 +81,12 @@ fn loop(return, store) {
           }
           #(store, Fetch(request:, resume:))
         }
-        eval.Read(path) -> {
+        eval.ReadFile(input) -> {
           let resume = fn(result) {
             let result = result.map_error(result, simplifile.describe_error)
-            loop(resume(read.encode(result)), store)
+            loop(resume(read_file.encode(result)), store)
           }
-          #(store, Read(path:, resume:))
+          #(store, ReadFile(input:, resume:))
         }
       }
     r.LookupReference(reference: _, resume: _) -> #(
@@ -148,7 +148,13 @@ fn lookup_release(package, release, resume, store, cwd) {
               )
             }
           }
-          #(store, Read(path:, resume:))
+          #(
+            store,
+            ReadFile(
+              input: read_file.Input(path:, offset: 0, limit: 10_000_000),
+              resume:,
+            ),
+          )
         }
         Error(_) -> {
           echo #(cwd, package)
@@ -204,8 +210,8 @@ pub type Effect(t) {
     request: Request(BitArray),
     resume: fn(Result(Response(BitArray), fetch.FetchError)) -> Return(t),
   )
-  Read(
-    path: String,
+  ReadFile(
+    input: read_file.Input,
     resume: fn(Result(BitArray, simplifile.FileError)) -> Return(t),
   )
 }

@@ -22,7 +22,7 @@ multiformats = ">= 4.0.0 and < 5.0.0"
 oas_generator_utils = ">= 1.1.0 and < 2.0.0"
 ogre = ">= 1.0.0 and < 2.0.0"
 overlay_llm = { path = "../llm" }
-touch_grass = ">= 0.1.0 and < 2.0.0"
+touch_grass = ">= 0.2.0 and < 2.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"

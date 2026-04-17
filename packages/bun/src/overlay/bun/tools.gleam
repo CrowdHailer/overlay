@@ -69,12 +69,12 @@ fn do(return) {
       }
       do(resume(return))
     }
-    eval.Read(path:, resume:) -> {
+    eval.ReadFile(input:, resume:) -> {
       // relative resolved in lookup in eval
       // let State(config:) = state
-      // let assert Ok(path) = filepathx.resolve_relative(config.root, path)
-      io.println("reading lower: " <> path)
-      do(resume(simplifile.read_bits(path)))
+      // let assert Ok(input) = filepathx.resolve_relative(config.root, input)
+      io.println("reading lower: " <> input.path)
+      do(resume(simplifile.read_bits(input.path)))
     }
     eval.Fetch(request:, resume:) -> {
       use result <- promise.await(fetchx.send_bits(request))
