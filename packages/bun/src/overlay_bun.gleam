@@ -4,8 +4,9 @@ import gleam/io
 import gleam/javascript/promise
 import overlay/bun/chat
 import overlay/bun/config
+import overlay/bun/ralph
 import overlay/bun/skills
-import overlay/config.{Config} as _
+import overlay/config.{Chat, Config, Ralph} as _
 
 pub fn main() -> promise.Promise(Nil) {
   use config <- try(config.load())
@@ -13,7 +14,10 @@ pub fn main() -> promise.Promise(Nil) {
   let skills = skills.read_all(config.root)
   io.println("discovered " <> int.to_string(dict.size(skills)) <> " skills")
   let config = Config(..config, skills:)
-  chat.start(config)
+  case config.mode {
+    Chat -> chat.start(config)
+    Ralph -> ralph.start(config)
+  }
 }
 
 fn try(result, then) {

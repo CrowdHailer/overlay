@@ -18,6 +18,12 @@ pub fn parse_valid_arguments_test() {
   let assert Ok(#("my-llm", continue)) =
     config.from_args([".", "--provider=my-llm"], cwd)
   let config = continue(dummy_provider())
+  assert config.Chat == config.mode
+  assert cwd == config.root
+
+  let assert Ok(#("", continue)) = config.from_args(["ralph", "."], cwd)
+  let config = continue(dummy_provider())
+  assert config.Ralph == config.mode
   assert cwd == config.root
 }
 

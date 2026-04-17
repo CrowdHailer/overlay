@@ -1,0 +1,54 @@
+import gleam/io
+import gleam/javascript/promise
+import gleam_community/ansi
+import overlay/bun/llm
+import overlay/bun/tools
+import overlay/llm/chat
+import overlay/llm/tool
+
+pub fn inner_loop(config, history, store) -> promise.Promise(_) {
+  use return <- promise.await(llm.stream(config, history))
+  io.println("")
+  case return {
+    Ok(completion) -> {
+      let history = [chat.from_completion(completion), ..history]
+      case completion.tool_calls {
+        [] -> promise.resolve(Ok(#(config, history, store)))
+        calls -> {
+          use #(history, store) <- promise.await(sequential_calls(
+            calls,
+            history,
+            store,
+          ))
+          inner_loop(config, history, store)
+        }
+      }
+    }
+    Error(reason) -> {
+      io.println(reason)
+      promise.resolve(Error(reason))
+    }
+  }
+}
+
+fn sequential_calls(calls, history, store) {
+  case calls {
+    [] -> promise.resolve(#(history, store))
+    [call, ..rest] -> {
+      let tool.Call(id:, function:) = call
+
+      use result <- promise.await(tools.execute(function, store))
+      let result = case result {
+        Error(message) -> {
+          io.println(ansi.bg_bright_red(message))
+          Error(message)
+        }
+        Ok(#(value, _)) -> Ok(value)
+      }
+      let result = llm.result_to_message(id, result)
+      let history = [result, ..history]
+
+      sequential_calls(rest, history, store)
+    }
+  }
+}

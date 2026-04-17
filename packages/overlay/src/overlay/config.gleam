@@ -9,6 +9,7 @@ import overlay/system
 
 pub type Config {
   Config(
+    mode: Mode,
     provider: provider.Provider,
     model: String,
     system_prompt: String,
@@ -29,12 +30,19 @@ pub fn from_args(
   arguments: List(String),
   current_directory: String,
 ) -> Result(#(String, fn(provider.Provider) -> Config), String) {
-  use Args(dir:, provider:) <- try(do_args(arguments, Args("", None)))
+  let #(mode, arguments) = case arguments {
+    ["ralph", ..rest] -> #(Ralph, rest)
+    _ -> #(Chat, arguments)
+  }
+  use Args(dir:, provider:, mode:) <- try(do_args(
+    arguments,
+    Args("", None, mode:),
+  ))
   use root <- try(filepathx.resolve_relative(current_directory, dir))
   let system_prompt = system.build_prompt(root)
   let resume = fn(provider) {
     let model = default_model(provider)
-    Config(provider:, model:, system_prompt:, root:, skills: dict.new())
+    Config(mode:, provider:, model:, system_prompt:, root:, skills: dict.new())
   }
   Ok(#(provider |> option.unwrap(""), resume))
 }
@@ -52,5 +60,10 @@ fn do_args(args, state) {
 }
 
 pub type Args {
-  Args(dir: String, provider: Option(String))
+  Args(dir: String, provider: Option(String), mode: Mode)
+}
+
+pub type Mode {
+  Chat
+  Ralph
 }

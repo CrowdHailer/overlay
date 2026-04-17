@@ -144,6 +144,7 @@ pub fn follows_relative_reference_test() {
 fn run(code) {
   let state =
     state.State(config: config.Config(
+      mode: config.Chat,
       provider: provider.Ollama(ollama.local()),
       model: "example-12b",
       system_prompt: "",
