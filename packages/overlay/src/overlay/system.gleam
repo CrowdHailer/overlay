@@ -1,4 +1,7 @@
-pub fn build_prompt(root) {
+import gleam/list
+import gleam/string
+
+pub fn build_prompt(root, context_files) {
   "You are an expery automation assistant.
 You help users by executing EYG scripts to interact with the users system.
 DO NOT guess any function of effects. Only use what you have seen explained and explore the filesystem to learn more about writing EYG code.
@@ -32,5 +35,15 @@ match perform ReadDirectory(path) {
   Error(reason) -> { reason }
 }
 ```
-"
+
+" <> case context_files {
+    [] -> ""
+    _ -> "# Project Context
+
+" <> list.map(context_files, fn(file) {
+        let #(path, content) = file
+        "## " <> path <> "\n\n" <> content
+      })
+      |> string.join("\n\n")
+  }
 }

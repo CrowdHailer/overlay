@@ -31,6 +31,7 @@ fn default_model(provider) {
 pub fn from_args(
   arguments: List(String),
   current_directory: String,
+  context_files: List(#(String, String)),
 ) -> Result(#(String, fn(provider.Provider) -> Config), String) {
   let #(mode, arguments) = case arguments {
     ["ralph", ..rest] -> #(Ralph, rest)
@@ -44,7 +45,7 @@ pub fn from_args(
   use execute_config <- try(
     config.load() |> result.replace_error("failed to load execute config"),
   )
-  let system_prompt = system.build_prompt(root)
+  let system_prompt = system.build_prompt(root, context_files)
   let resume = fn(provider) {
     let model = default_model(provider)
     Config(

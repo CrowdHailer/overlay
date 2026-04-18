@@ -16,12 +16,12 @@ pub fn parse_valid_arguments_test() {
   let cwd = g.dir()
 
   let assert Ok(#("my-llm", continue)) =
-    config.from_args([".", "--provider=my-llm"], cwd)
+    config.from_args([".", "--provider=my-llm"], cwd, [])
   let config = continue(dummy_provider())
   assert config.Chat == config.mode
   assert cwd == config.root
 
-  let assert Ok(#("", continue)) = config.from_args(["ralph", "."], cwd)
+  let assert Ok(#("", continue)) = config.from_args(["ralph", "."], cwd, [])
   let config = continue(dummy_provider())
   assert config.Ralph == config.mode
   assert cwd == config.root
@@ -30,19 +30,19 @@ pub fn parse_valid_arguments_test() {
 pub fn resolved_valid_path_test() {
   let cwd = g.dir()
 
-  let assert Ok(#("", continue)) = config.from_args(["./foo"], cwd)
+  let assert Ok(#("", continue)) = config.from_args(["./foo"], cwd, [])
   let config = continue(dummy_provider())
   assert cwd <> "/foo" == config.root
 
-  let assert Ok(#("", continue)) = config.from_args(["foo"], cwd)
+  let assert Ok(#("", continue)) = config.from_args(["foo"], cwd, [])
   let config = continue(dummy_provider())
   assert cwd <> "/foo" == config.root
 
-  let assert Ok(#("", continue)) = config.from_args(["../foo"], cwd)
+  let assert Ok(#("", continue)) = config.from_args(["../foo"], cwd, [])
   let config = continue(dummy_provider())
   assert "/tmp/foo" == config.root
 
-  let assert Ok(#("", continue)) = config.from_args(["/foo"], cwd)
+  let assert Ok(#("", continue)) = config.from_args(["/foo"], cwd, [])
   let config = continue(dummy_provider())
   assert "/foo" == config.root
 }
@@ -50,8 +50,8 @@ pub fn resolved_valid_path_test() {
 pub fn cant_escape_directory_test() {
   let cwd = g.dir()
   let assert Error("invalid relative directory") =
-    config.from_args(["/../foo"], cwd)
+    config.from_args(["/../foo"], cwd, [])
 
   let assert Error("invalid relative directory") =
-    config.from_args(["../../../foo"], cwd)
+    config.from_args(["../../../foo"], cwd, [])
 }

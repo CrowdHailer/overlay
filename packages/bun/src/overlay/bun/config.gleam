@@ -7,7 +7,9 @@ import overlay/llm/provider/mistral
 import overlay/llm/provider/ollama
 import simplifile
 
-pub fn load() {
+pub fn load(
+  context_files: List(#(String, String)),
+) -> Result(config.Config, String) {
   use current_directory <- try(
     simplifile.current_directory()
     |> result.map_error(simplifile.describe_error),
@@ -16,6 +18,7 @@ pub fn load() {
   use #(provider, continue) <- try(config.from_args(
     argv.load().arguments,
     current_directory,
+    context_files,
   ))
 
   case provider {
