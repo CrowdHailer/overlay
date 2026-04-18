@@ -1,3 +1,4 @@
+import eyg/cli/internal/config
 import gleam/dict.{type Dict}
 import gleam/option.{type Option, None, Some}
 import gleam/result.{try}
@@ -15,6 +16,7 @@ pub type Config {
     system_prompt: String,
     root: String,
     skills: Dict(String, skills.Document),
+    execute_config: config.Config,
   )
 }
 
@@ -39,10 +41,21 @@ pub fn from_args(
     Args("", None, mode:),
   ))
   use root <- try(filepathx.resolve_relative(current_directory, dir))
+  use execute_config <- try(
+    config.load() |> result.replace_error("failed to load execute config"),
+  )
   let system_prompt = system.build_prompt(root)
   let resume = fn(provider) {
     let model = default_model(provider)
-    Config(mode:, provider:, model:, system_prompt:, root:, skills: dict.new())
+    Config(
+      mode:,
+      provider:,
+      model:,
+      system_prompt:,
+      root:,
+      skills: dict.new(),
+      execute_config:,
+    )
   }
   Ok(#(provider |> option.unwrap(""), resume))
 }

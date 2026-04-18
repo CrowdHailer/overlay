@@ -1,0 +1,3 @@
+[submodule "packages/eyg"]
+	path = packages/eyg
+	url = git@github.com:CrowdHailer/eyg-lang.git

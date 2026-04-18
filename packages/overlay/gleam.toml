@@ -9,6 +9,7 @@ links = []
 [dependencies]
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
 castor = ">= 2.0.0 and < 3.0.0"
+eyg_cli = { path = "../eyg/packages/gleam_cli" }
 eyg_interpreter = ">= 1.1.0 and < 2.0.0"
 eyg_ir = ">= 1.0.0 and < 2.0.0"
 eyg_parser = ">= 0.2.0 and < 1.0.0"

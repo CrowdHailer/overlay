@@ -8,29 +8,23 @@
 //// The code execution tool is defined sans io using an effect type defined in this project.
 //// The other tools could use the same effect logic, this is probably a good idea once we start applying policies for which files can be read.
 
+import eyg/cli/internal/execute
+import eyg/cli/internal/source
+import eyg/interpreter/simple_debug
+import eyg/parser/parser
 import gleam/fetch
 import gleam/io
 import gleam/javascript/promise.{type Promise}
+import gleam/option.{None, Some}
 import gleam/result
 import gleam/string
 import gleam_community/ansi
-import overlay/bun/config
-import overlay/bun/gleam/fetchx
-import overlay/bun/midas
-import overlay/bun/tools/eval
-import overlay/bun/tools/state.{type State, State}
-import overlay/filepathx
+import overlay/bun/config as bun_config
+import overlay/bun/tools/state.{type State}
+import overlay/config
 import overlay/llm/tool
 import overlay/tools
-import overlay/tools/get
-import overlay/tools/ls
-import overlay/tools/read
 import overlay/tools/search
-import simplifile
-import snag
-import spotless
-import spotless/oauth_2_1/token
-import spotless/proof_key_for_code_exchange as pkce
 
 pub fn execute(
   call: tool.FunctionCall,
@@ -41,12 +35,23 @@ pub fn execute(
     Ok(call) -> {
       io.println(ansi.bg_bright_green(tools.log_line(call)))
       case call {
-        tools.Eval(code) -> do(eval.run(code, state))
-        tools.Get(url) -> get(url, state)
-        tools.Ls(path) -> ls(path, state)
-        tools.Read(path) -> read(path, state)
+        tools.Eval(code) -> {
+          use exp <- promise.try_sync(
+            source.block_expression(code)
+            |> result.map_error(parser.describe_reason),
+          )
+
+          let config.Config(root:, execute_config:, ..) = state.config
+          use result <- promise.map(execute.block(exp, [], root, execute_config))
+          case result {
+            // current state is not used by the CLI implementation, this will need to change.
+            Ok(#(Some(value), _)) ->
+              Ok(#(tool.Return(simple_debug.inspect(value), []), state))
+            Ok(#(None, _)) -> Ok(#(tool.Return("", []), state))
+            Error(reason) -> Error(simple_debug.describe(reason))
+          }
+        }
         tools.Search(query) -> search(query, state)
-        tools.Write(#(path, content)) -> write(path, content, state)
       }
     }
     Error(reason) ->
@@ -54,78 +59,11 @@ pub fn execute(
   }
 }
 
-fn do(return) {
-  let #(state, action) = return
-  case action {
-    eval.Done(Ok(text)) -> promise.resolve(Ok(#(tool.Return(text, []), state)))
-    eval.Done(Error(reason)) -> promise.resolve(Error(reason))
-    eval.Authorize(service:, resume:) -> {
-      use return <- promise.await(
-        midas.run(spotless.authenticate(service, [], "", 8080, pkce.S256)),
-      )
-      let return = case return {
-        Ok(token.Response(access_token:, ..)) -> Ok(access_token)
-        Error(reason) -> Error(snag.line_print(reason))
-      }
-      do(resume(return))
-    }
-    eval.ReadFile(input:, resume:) -> {
-      // relative resolved in lookup in eval
-      // let State(config:) = state
-      // let assert Ok(input) = filepathx.resolve_relative(config.root, input)
-      io.println("reading lower: " <> input.path)
-      do(resume(simplifile.read_bits(input.path)))
-    }
-    eval.Fetch(request:, resume:) -> {
-      use result <- promise.await(fetchx.send_bits(request))
-      do(resume(result))
-    }
-  }
-}
-
-fn get(url: String, state: a) -> Promise(Result(#(tool.Return, a), String)) {
-  use #(request, resume) <- promise.try_sync(get.sans_io(url))
-  use response <- promise.try_await(send(request))
-  promise.resolve(Ok(#(resume(response), state)))
-}
-
-fn ls(path, state) {
-  let State(config:) = state
-  use path <- promise.try_sync(filepathx.resolve_relative(config.root, path))
-  use content <- promise.try_sync(
-    simplifile.read_directory(path)
-    |> result.map_error(simplifile.describe_error),
-  )
-  promise.resolve(Ok(#(ls.resume(content), state)))
-}
-
-fn read(path, state) {
-  let State(config:) = state
-  use path <- promise.try_sync(filepathx.resolve_relative(config.root, path))
-  use content <- promise.try_sync(
-    simplifile.read_bits(path)
-    |> result.map_error(simplifile.describe_error),
-  )
-  use value <- promise.try_sync(read.resume(path, content))
-  promise.resolve(Ok(#(value, state)))
-}
-
 pub fn search(query, state) -> Promise(Result(_, String)) {
-  use token <- promise.try_sync(config.get_env("OLLAMA_API_KEY"))
+  use token <- promise.try_sync(bun_config.get_env("OLLAMA_API_KEY"))
   let #(request, resume) = search.sans_io(token, query)
   use response <- promise.try_await(send(request))
   use value <- promise.try_sync(resume(response))
-  promise.resolve(Ok(#(value, state)))
-}
-
-fn write(path, content, state) {
-  let State(config:) = state
-  use path <- promise.try_sync(filepathx.resolve_relative(config.root, path))
-  use Nil <- promise.try_sync(
-    simplifile.write(path, content)
-    |> result.map_error(simplifile.describe_error),
-  )
-  let value = tool.Return("written", [])
   promise.resolve(Ok(#(value, state)))
 }
 

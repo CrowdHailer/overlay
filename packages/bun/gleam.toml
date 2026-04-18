@@ -11,6 +11,7 @@ links = []
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
 argv = ">= 1.0.2 and < 2.0.0"
 envoy = ">= 1.1.0 and < 2.0.0"
+eyg_cli = { path = "../eyg/packages/gleam_cli" }
 eyg_interpreter = ">= 1.1.0 and < 2.0.0"
 eyg_ir = ">= 1.0.0 and < 2.0.0"
 eyg_parser = ">= 0.3.0 and < 1.0.0"

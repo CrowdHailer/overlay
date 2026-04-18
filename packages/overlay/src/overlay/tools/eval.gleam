@@ -1,22 +1,11 @@
 import castor
-import eyg/interpreter/break
-import eyg/ir/tree
-import eyg/parser
 import gleam/dynamic/decode
-import gleam/http/request
-import gleam/result
 import oas/generator/utils
-import ogre/operation
 import overlay/llm/tool
-import overlay/runner
-import touch_grass/decode_json
-import touch_grass/fetch
-import touch_grass/file_system/read_file
-import touch_grass/http
 
 pub const name = "eval"
 
-pub const description = "Run an EYG script, always read the write-eyg skill before evaluating any code."
+pub const description = "Run an EYG script"
 
 pub fn parameters() {
   [castor.field("code", castor.string())]
@@ -32,43 +21,4 @@ pub fn cast(arguments) {
     decode.field("code", decode.string, decode.success)
   }
   decode.run(arguments, decoder)
-}
-
-pub fn sans_io(code: String) {
-  use source <- result.map(parser.all_from_string(code))
-  let source = tree.clear_annotation(source)
-  runner.expression(source, parse_effect)
-}
-
-/// The effects defined here mean that the effects available to scripts in overlay assitants are always the same.
-/// I have made the assumption that overlay assistants will all be set up to work in a similar workspace.
-/// If this assumption is false, the sans_io function will accept a parse_effect function from the caller.
-pub type Effect {
-  DirectFetch(service: String, operation: operation.Operation(BitArray))
-  Fetch(request: request.Request(BitArray))
-  ReadFile(input: read_file.Input)
-}
-
-fn parse_effect(label, lift) {
-  case label {
-    "DecodeJSON" -> {
-      use input <- result.map(decode_json.decode(lift))
-      runner.Reply(decode_json.sync(input))
-    }
-    "DNSimple" -> direct_fetch("dnsimple", lift)
-    "Fetch" -> {
-      use request <- result.map(fetch.decode(lift))
-      runner.External(Fetch(request:))
-    }
-    "ReadFile" -> {
-      use input <- result.map(read_file.decode(lift))
-      runner.External(ReadFile(input:))
-    }
-    _ -> Error(break.UnhandledEffect(label, lift))
-  }
-}
-
-fn direct_fetch(service, lift) {
-  use operation <- result.map(http.operation_to_gleam(lift))
-  runner.External(DirectFetch(service:, operation:))
 }

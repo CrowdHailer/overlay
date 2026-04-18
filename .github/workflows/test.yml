@@ -14,9 +14,12 @@ jobs:
         gleam: ["1.14", "1.15.1"]
         otp: ["28.2", "28.3"]
         rebar3: ["3.25"]
-        package: ["llm", "overlay"]
+        # TODO reinstate overlay once we don't depend on eyg_cli (which is JS only)
+        package: ["llm"]
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
@@ -42,6 +45,8 @@ jobs:
         package: ["bun", "llm", "overlay"]
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: ${{matrix.bun}}
